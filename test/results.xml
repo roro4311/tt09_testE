@@ -1,0 +1,6 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1729607896" />
+    <testcase name="test_morse_code_A" classname="test" file="/Users/roshenramnarine/Downloads/tt09-verilog-template/test/test.py" lineno="45" time="2.004185199737549" sim_time_ns="950030.001" ratio_time="474023.0599070425" />
+  </testsuite>
+</testsuites>
