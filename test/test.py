@@ -36,7 +36,8 @@ async def apply_morse_code_A(dut):
 
     # Check the output on the seven-segment display
     await RisingEdge(dut.clk)
-    seg_val = dut.uio_out.value.integer & 0x7F  # Only 7 bits used for the 7-segment display
+    await Timer(10, units='ns')  # or an appropriate delay
+    seg_val = dut.uio_out.value.integer & 0x7F
 
     # Mapping of 'A' to 7-segment display value (you need to adjust this based on your display encoding)
     expected_seg = 0b01001111  # Example encoding for 'A'
