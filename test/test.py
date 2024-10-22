@@ -39,6 +39,12 @@ async def apply_morse_code_A(dut):
     await Timer(10, units='ns')  # or an appropriate delay
     seg_val = dut.uio_out.value.integer & 0x7F
 
+    if 'x' not in dut.uio_out.value.binstr:
+    seg_val = dut.uio_out.value.integer & 0x7F
+else:
+    raise TestFailure(f"Invalid value detected: {dut.uio_out.value.binstr}")
+
+
     # Mapping of 'A' to 7-segment display value (you need to adjust this based on your display encoding)
     expected_seg = 0b01001111  # Example encoding for 'A'
     assert seg_val == expected_seg, f"Expected {expected_seg:#07b}, got {seg_val:#07b}"
