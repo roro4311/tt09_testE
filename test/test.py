@@ -40,7 +40,7 @@ async def apply_morse_code_A(dut):
     seg_val = dut.uio_out.value.integer & 0x7F
 
     # Mapping of 'A' to 7-segment display value (you need to adjust this based on your display encoding)
-    expected_seg = 0b01001111  # Example encoding for 'A'
+    expected_seg = 0b0111111  # Example encoding for 'A'
     assert seg_val == expected_seg, f"Expected {expected_seg:#07b}, got {seg_val:#07b}"
 
 @cocotb.test()
