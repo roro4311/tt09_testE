@@ -30,7 +30,7 @@ module tb;
         forever #5 clk = ~clk; // 100 MHz clock
     end
 
-    // VCD dump logic (move to separate initial block)
+    // VCD dump logic
     initial begin
         $dumpfile("dump.vcd");    // Specify the name of the VCD file
         $dumpvars(0, tb);         // Dump all variables in the tb module
@@ -50,17 +50,16 @@ module tb;
         // Simulate Morse code for "A" (.-)
 
         // Dot (short press)
-        ui_in[0] = 1'b1;  // Button pressed
-        #100_000;         // Hold for 100_000 ns (dot duration)
-        ui_in[0] = 1'b0;  // Button released
-        #50_000;          // Wait 50_000 ns between symbols
+        ui_in[0] = 1'b1;          // Button pressed
+        #100_000;                 // Hold for 100_000 ns (dot duration)
+        ui_in[0] = 1'b0;          // Button released
+        #100_000;                 // Wait 1 dot duration between symbols within a letter
 
         // Dash (long press)
-        ui_in[0] = 1'b1;  // Button pressed
-        #300_000;         // Hold for 300_000 ns (dash duration)
-        ui_in[0] = 1'b0;  // Button released
-        #500_000;         // Wait after character entry
-
+        ui_in[0] = 1'b1;          // Button pressed
+        #300_000;                 // Hold for 300_000 ns (dash duration)
+        ui_in[0] = 1'b0;          // Button released
+        #300_000;                 // Wait 3 dot durations after character entry
 
         // End simulation
         #1_000_000;
