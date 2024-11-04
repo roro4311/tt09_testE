@@ -26,13 +26,13 @@ async def apply_morse_code_A(dut):
     dut.ui_in[0].value = 1  # Button pressed
     await Timer(100_000, units="ns")  # Dot duration
     dut.ui_in[0].value = 0  # Button released
-    await Timer(50_000, units="ns")  # Wait between symbols
+    await Timer(100_000, units="ns")  # Wait between symbols
 
   # Simulate a dash (long press)
     dut.ui_in[0].value = 1  # Button pressed
     await Timer(300_000, units="ns")  # Dash duration
     dut.ui_in[0].value = 0  # Button released
-    await Timer(500_000, units="ns")  # Wait after character entry
+    await Timer(300_000, units="ns")  # Wait after character entry
 
     # Check the output on the seven-segment display
     await RisingEdge(dut.clk)
