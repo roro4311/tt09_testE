@@ -30,9 +30,9 @@ module button_input (
             end else if (!button && !button_released) begin
                 // Button released; determine if it's a dot or dash
                 if (counter >= 2000)  // Dash threshold
-                    morse_signal <= 2'b01;  // Dash
+                    morse_signal <= 2'b10;  // Dash
                 else if (counter >= 100) // Adjust lower threshold for dot
-                    morse_signal <= 2'b10;  // Dot
+                    morse_signal <= 2'b01;  // Dot
                 else
                     morse_signal <= 2'b00;  // No valid input
 
