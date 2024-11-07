@@ -29,6 +29,7 @@ module morse_decoder (
                     // Space indicates end of a character
                     if (bit_count > 0) begin
                         // Decode Morse sequence when a full character is entered
+                         $display("Captured Morse Sequence: %b", morse_seq); // Debug print
                         case (morse_seq)
                             6'b01_00_00: decoded_char <= "A";  // .-
                             6'b10_00_00: decoded_char <= "B";  // -...
