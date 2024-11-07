@@ -42,7 +42,10 @@ async def apply_morse_code_A(dut):
     # Mapping of 'A' to 7-segment display value (you need to adjust this based on your display encoding)
     expected_seg = 0b0111111  # Example encoding for 'A'
     assert seg_val == expected_seg, f"Expected {expected_seg:#07b}, got {seg_val:#07b}"
+decoded_char = dut.decoded_char.value
+    cocotb.log.info(f"Decoded character: {decoded_char}")
 
+    assert decoded_char == ord('A'), f"Expected A but got {chr(decoded_char)}"
 @cocotb.test()
 async def test_morse_code_A(dut):
     """Test Morse code for 'A'."""
