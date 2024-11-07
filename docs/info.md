@@ -1,38 +1,33 @@
 ## How it works
 
-The Reaction Timer project measures the reaction time of a user by detecting the time interval between when an LED lights up and when a button is pressed. The reaction time is then displayed on four 7-segment displays. The project consists of several Verilog modules that handle the timer logic, SPI communication, and display control.
+The Morse Decoder project takes in signals from button presses to interpret Morse code, decodes each sequence into its corresponding letter, and displays the result on a 7-segment display. The project consists of several Verilog modules that handle input signal processing, Morse code decoding, and display control.
 
-1. **Reaction Timer Logic**: The core module starts counting when the LED is lit and stops counting when the button is pressed. The measured reaction time is stored in a register and displayed on the 7-segment displays.
-2. **SPI Driver**: This module handles the communication between the main controller and the 7-segment displays via the SPI protocol.
-3. **Top Module**: The top module integrates the reaction timer logic and SPI driver, managing the inputs and outputs to ensure correct operation.
+1. **Button Input Logic**: This module reads button press durations to differentiate between dots and dashes and recognizes spacing to interpret letter boundaries.
+2. **Morse Decoder**: This module receives the processed button signals, decodes the Morse code into its corresponding letter, and sends the decoded character to the display module.
+3. **7-Segment Display Control**: The display module converts the decoded letter into a format suitable for displaying on the 7-segment display.
 
 ## How to test
 
-To test the Reaction Timer project, follow these steps:
+To test the Morse Decoder project, follow these steps:
 
 1. **Setup**:
-   - Ensure you have a compatible FPGA board with the necessary I/O pins connected to the button and LED.
-   - Connect the 7-segment displays to the FPGA board using the SPI interface.
-
+   - Connect the button and 7-segment display to the appropriate I/O pins on a compatible FPGA board.
+   
 2. **Simulation**:
-   - Use the provided testbenches to simulate the reaction timer logic.
-   - Run the simulation using a tool like Icarus Verilog to verify the timing and output correctness.
+   - Use provided testbenches to simulate the button input logic and decoding functionality.
+   - Verify that the Morse code sequences are accurately interpreted and displayed.
 
 3. **Synthesis and Implementation**:
    - Synthesize the design using your preferred FPGA toolchain.
    - Implement the design on your FPGA board.
 
 4. **Operation**:
-   - Press the reset button to initialize the system.
-   - Wait for the LED to light up.
-   - Press the button as quickly as possible when the LED lights up.
-   - Observe the reaction time displayed on the 7-segment displays.
+   - Press the button in short (dot) or long (dash) durations to enter Morse code for a character.
+   - Observe the decoded letter on the 7-segment display.
 
 ## External hardware
 
-The Reaction Timer project uses the following external hardware:
+The Morse Decoder project requires the following external hardware:
 
-1. **Button**: A simple push-button switch used to measure the reaction time.
-2. **LED**: An LED indicator that lights up to signal the user to press the button.
-3. **7-Segment Displays**: Four 7-segment displays connected via the SPI interface to show the measured reaction time.
-
+1. **Button**: A push-button for entering Morse code by pressing in dot/dash durations.
+2. **7-Segment Display**: A display that shows the decoded letter from each Morse code sequence entered by the user.
