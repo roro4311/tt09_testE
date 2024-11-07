@@ -1,6 +1,5 @@
-# Tiny Tapeout project information
 project:
-  title:        "Reaction Timer"      # Project title
+  title:        "Morse Decoder"      # Project title
   author:       "Roshen Ramnarine"    # Your name
   discord:      "roro4311"            # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
   description:  "Measures reaction time and displays it on four 7-segment displays" # One line description of what your project does
