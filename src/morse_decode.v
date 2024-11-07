@@ -19,11 +19,11 @@ module morse_decoder (
 
             // On space or end of sequence, decode the character
            case (morse_seq)
-            6'b01_00_00: decoded_char <= "A";  // .-
+            6'b00_00_00: decoded_char <= "A";  // .-
             6'b10_00_00: decoded_char <= "B";  // -...
             6'b10_10_00: decoded_char <= "C";  // -.-.
             6'b10_01_00: decoded_char <= "D";  // -..
-            6'b00_00_00: decoded_char <= "E";  // .
+            6'b01_00_00: decoded_char <= "E";  // .
             6'b01_10_00: decoded_char <= "F";  // ..-.
             6'b10_10_10: decoded_char <= "G";  // --.
             6'b01_01_00: decoded_char <= "H";  // ....
