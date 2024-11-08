@@ -5,40 +5,67 @@ module morse_decoder_combined (
     output reg [7:0] decoded_char
 );
 
-    // Morse signal encoding: 00 = no input, 01 = dot, 10 = dash
-    reg [1:0] morse_signal;
-    reg [5:0] morse_seq;    // Sequence of dots/dashes (up to 6 bits)
-    reg [31:0] counter;     // To measure button press duration
-    reg button_released;    // Track if button was released
+    // Morse signal encoding: 0 = no input, 1 = dot, 2 = dash
+    reg [5:0] morse_seq;         // Sequence of dots/dashes (up to 6 bits)
+    reg [31:0] counter;          // To measure button press duration
+    reg [31:0] gap_counter;      // To measure gap duration after button release
+    reg button_released;         // Track if button was released
+    reg new_char;                // Signal indicating new character detected
+
+    // Morse code timing parameters (adjust as needed)
+    parameter DOT_DURATION = 2000;
+    parameter DASH_DURATION = 3 * DOT_DURATION;
+    parameter INTER_ELEMENT_GAP = DOT_DURATION;
+    parameter LETTER_GAP = 3 * DOT_DURATION;
+    parameter WORD_GAP = 7 * DOT_DURATION;
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            morse_signal <= 2'b00;
             morse_seq <= 6'b0;
             decoded_char <= 8'b0;
             counter <= 32'b0;
+            gap_counter <= 32'b0;
             button_released <= 1'b1;
+            new_char <= 1'b0;
         end else begin
-            // Button Input Logic
+            // Button Press Logic
             if (button) begin
-                counter <= counter + 1;       // Increment counter while button is pressed
-                button_released <= 1'b0;      // Button is held down
+                counter <= counter + 1;   // Increment counter while button is pressed
+                gap_counter <= 32'b0;     // Reset gap counter during press
+                button_released <= 1'b0;
             end else if (!button && !button_released) begin
-                // Button released: determine dot or dash
-                if (counter >= 2000)
-                    morse_signal <= 2'b10;  // Dash
-                else if (counter >= 100)
-                    morse_signal <= 2'b01;  // Dot
-                else
-                    morse_signal <= 2'b00;  // Invalid press (reset signal)
-
-                // Shift morse_seq with new dot/dash
-                if (morse_signal != 2'b00) begin
-                    morse_seq <= {morse_seq[4:0], morse_signal[0]};
-                    $display("Captured Morse Sequence: %b", morse_seq);
+                // Button released; determine dot or dash
+                if (counter >= DASH_DURATION) begin
+                    morse_seq <= {morse_seq[4:0], 1'b0};  // Dash (0)
+                end else if (counter >= DOT_DURATION) begin
+                    morse_seq <= {morse_seq[4:0], 1'b1};  // Dot (1)
                 end
 
-                // Decode morse_seq into character
+                // Display captured sequence for debugging
+                $display("Captured Morse Sequence: %b", morse_seq);
+
+                // Reset button tracking and counter
+                counter <= 32'b0;
+                button_released <= 1'b1;
+            end else if (button_released) begin
+                // Button is not pressed; count gap duration
+                gap_counter <= gap_counter + 1;
+
+                // Detect end of letter or word based on gap duration
+                if (gap_counter >= LETTER_GAP && gap_counter < WORD_GAP) begin
+                    // Letter gap detected; ready to decode
+                    new_char <= 1'b1;
+                end else if (gap_counter >= WORD_GAP) begin
+                    // Word gap detected; reset sequence
+                    morse_seq <= 6'b0;
+                    new_char <= 1'b0;
+                end else begin
+                    new_char <= 1'b0;
+                end
+            end
+
+            // Decode morse_seq into character
+            if (new_char) begin
                 case (morse_seq)
                     6'b01_00_00: decoded_char <= "A";  // .-
                     6'b10_00_00: decoded_char <= "B";  // -...
@@ -69,17 +96,9 @@ module morse_decoder_combined (
                     default: decoded_char <= 8'h00;    // Unknown
                 endcase
 
-                // Reset sequence after decoding a character
-                if (decoded_char != 8'h00) begin
-                    morse_seq <= 6'b0;
-                end
-
-                // Reset for next button press
-                counter <= 32'b0;
-                button_released <= 1'b1;
-                morse_signal <= 2'b00;
-            end else begin
-                morse_signal <= 2'b00;  // No input when button is not pressed
+                // Reset sequence and new_char flag after decoding
+                morse_seq <= 6'b0;
+                new_char <= 1'b0;
             end
         end
     end
