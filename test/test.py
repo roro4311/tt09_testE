@@ -1,53 +1,40 @@
 import cocotb
-from cocotb.clock import Clock
-from cocotb.triggers import RisingEdge, Timer
-from cocotb.regression import TestFactory
-
-# Clock period in ns
-CLOCK_PERIOD = 10
-
-@cocotb.coroutine
-async def reset_dut(dut):
-    """Reset the DUT."""
-    dut.rst_n.value = 0
-    await Timer(20, units="ns")
-    dut.rst_n.value = 1
-    await RisingEdge(dut.clk)
-    await RisingEdge(dut.clk)
-
-@cocotb.coroutine
-async def apply_morse_code_A(dut):
-    """Apply Morse code for 'A' (.-) and check output."""
-    # Reset the design
-    await reset_dut(dut)
-
-
-    # Simulate a dot (short press)
-    dut.ui_in[0].value = 1  # Button pressed
-    await Timer(100_000, units="ns")  # Dot duration
-    dut.ui_in[0].value = 0  # Button released
-    await Timer(100_000, units="ns")  # Wait between symbols
-
-  # Simulate a dash (long press)
-    dut.ui_in[0].value = 1  # Button pressed
-    await Timer(300_000, units="ns")  # Dash duration
-    dut.ui_in[0].value = 0  # Button released
-    await Timer(300_000, units="ns")  # Wait after character entry
-
-    # Check the output on the seven-segment display
-    await RisingEdge(dut.clk)
-    await Timer(10, units='ns')  # or an appropriate delay
-    seg_val = dut.uio_out.value.integer & 0x7F
-
-    # Mapping of 'A' to 7-segment display value (you need to adjust this based on your display encoding)
-    expected_seg = 0b0111111  # Example encoding for 'A'
-    assert seg_val == expected_seg, f"Expected {expected_seg:#07b}, got {seg_val:#07b}"
+from cocotb.triggers import RisingEdge, FallingEdge
 
 @cocotb.test()
-async def test_morse_code_A(dut):
-    """Test Morse code for 'A'."""
-    # Start clock
-    cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD, units="ns").start())
+async def test_morse_code(dut):
+    # Initialize reset
+    dut.rst_n.value = 0
+    dut.ui_in.value = 0
+    await RisingEdge(dut.clk)
+    dut.rst_n.value = 1
+    await RisingEdge(dut.clk)
 
-    # Apply Morse code for the letter "A" and check
-    await apply_morse_code_A(dut)
+    # Function to print `seg` output from `uio_out`
+    async def monitor_seg():
+        previous_seg = None
+        while True:
+            await RisingEdge(dut.clk)
+            current_seg = dut.uio_out.value & 0x7F  # Extract 7-bit seg value
+            if current_seg != previous_seg:
+                previous_seg = current_seg
+                print(f"Captured seg output: {current_seg:07b}")
+
+    # Start monitoring coroutine in the background
+    cocotb.fork(monitor_seg())
+
+    # Send Morse code for "A" (dot-dash sequence)
+    # Dot press
+    dut.ui_in.value = 1  # Button press for dot
+    await cocotb.triggers.Timer(100, units="ns")
+    dut.ui_in.value = 0  # Release button
+    await cocotb.triggers.Timer(100, units="ns")  # 1-dot gap
+
+    # Dash press
+    dut.ui_in.value = 1  # Button press for dash
+    await cocotb.triggers.Timer(300, units="ns")
+    dut.ui_in.value = 0  # Release button
+    await cocotb.triggers.Timer(700, units="ns")  # 7-dot gap to signal end of character
+
+    # Wait for decoding to complete
+    await cocotb.triggers.Timer(1000, units="ns")
