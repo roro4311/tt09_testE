@@ -15,7 +15,6 @@ module morse_decoder (
         // Only update morse_seq if a dot or dash signal is received
         if (morse_signal == 2'b01 || morse_signal == 2'b10) begin
             morse_seq <= {morse_seq[4:0], morse_signal[0]}; // Shift sequence
-            $display("Captured Morse Sequence: %b", morse_seq);
         end
 
             // On space or end of sequence, decode the character
