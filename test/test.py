@@ -40,7 +40,8 @@ async def test_morse_code(dut):
 
     # Wait for decoding to complete
     await cocotb.triggers.Timer(1000, units="ns")
+    seg_val = dut.uio_out.value.integer & 0x7F
 
     # Assert that the decoded character is "A"
-    assert dut.decoded_char.value == 8'h41, f"Expected 'A' but got {dut.decoded_char.value}"
-
+    expected_seg = 0b01001111  # Example encoding for 'A'
+    assert seg_val == expected_seg, f"Expected {expected_seg:#07b}, got {seg_val:#07b}"
