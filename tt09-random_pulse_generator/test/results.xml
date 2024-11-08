@@ -1,0 +1,8 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1730650459" />
+    <testcase name="test_morse_code_A" classname="test" file="/Users/roshenramnarine/Downloads/tt09-verilog-test1_E/test/test.py" lineno="43" time="24.119810104370117" sim_time_ns="1250022.001" ratio_time="51825.532439557486">
+      <failure message="Test failed with RANDOM_SEED=1730650459" />
+    </testcase>
+  </testsuite>
+</testsuites>
