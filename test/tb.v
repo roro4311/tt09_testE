@@ -1,68 +1,50 @@
-`timescale 1ns/1ps
-
 module tb;
-
-    // Testbench signals
     reg clk;
     reg rst_n;
     reg [7:0] ui_in;
     wire [7:0] uo_out;
     wire [7:0] uio_out;
     wire [7:0] uio_oe;
-    reg [7:0] uio_in;
     reg ena;
 
-    // Instantiate the top-level module
-    tt_um_morse_code dut (
+    // Instantiate the tt_um_morse_code module
+    tt_um_morse_code uut (
         .clk(clk),
         .rst_n(rst_n),
         .ui_in(ui_in),
         .uo_out(uo_out),
         .uio_out(uio_out),
         .uio_oe(uio_oe),
-        .uio_in(uio_in),
+        .uio_in(8'b0), // No input from uio_in for this test
         .ena(ena)
     );
 
     // Clock generation
     initial begin
         clk = 0;
-        forever #5 clk = ~clk; // 100 MHz clock
+        forever #5 clk = ~clk;  // 10 ns clock period (100 MHz)
     end
 
-    // VCD dump logic
+    // Test sequence
     initial begin
-        $dumpfile("dump.vcd");    // Specify the name of the VCD file
-        $dumpvars(0, tb);         // Dump all variables in the tb module
-    end
-
-    // Simulation logic
-    initial begin
-        // Initialize inputs
+        // Initialize
         rst_n = 0;
         ui_in = 8'b0;
-        uio_in = 8'b0;
-        ena = 1'b1;
+        ena = 1;
+        #20 rst_n = 1;
 
-        // Reset the design
-        #10 rst_n = 1;
+        // Morse code for "A" (dot-dash): Dot (100 ns), 1-dot gap, Dash (300 ns)
+        // Dot press
+        ui_in[0] = 1;        // Simulate button press for dot
+        #100 ui_in[0] = 0;   // Release button
+        #100;                // Element gap (1 dot duration)
 
-        // Simulate Morse code for "A" (.-)
+        // Dash press
+        ui_in[0] = 1;        // Simulate button press for dash
+        #300 ui_in[0] = 0;   // Release button
+        #700;                // Word gap (7 dots) to end character
 
-        // Dot (short press)
-        ui_in[0] = 1'b1;          // Button pressed
-        #100_000;                 // Hold for 100_000 ns (dot duration)
-        ui_in[0] = 1'b0;          // Button released
-        #100_000;                 // Wait 1 dot duration between symbols within a letter
-
-        // Dash (long press)
-        ui_in[0] = 1'b1;          // Button pressed
-        #300_000;                 // Hold for 300_000 ns (dash duration)
-        ui_in[0] = 1'b0;          // Button released
-        #300_000;                 // Wait 3 dot durations after character entry
-
-        // End simulation
-        #1_000_000;
-        $finish;
+        // End of simulation
+        #1000 $stop;
     end
 endmodule
