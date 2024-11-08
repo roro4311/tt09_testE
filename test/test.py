@@ -1,5 +1,7 @@
 import cocotb
+from cocotb.regression import TestFactory
 from cocotb.triggers import RisingEdge, FallingEdge
+
 
 @cocotb.test()
 async def test_morse_code(dut):
@@ -38,3 +40,7 @@ async def test_morse_code(dut):
 
     # Wait for decoding to complete
     await cocotb.triggers.Timer(1000, units="ns")
+
+    # Assert that the decoded character is "A"
+    assert dut.decoded_char.value == 8'h41, f"Expected 'A' but got {dut.decoded_char.value}"
+
